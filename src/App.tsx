@@ -9,6 +9,7 @@ import {
   Clock,
   Plus,
 } from 'lucide-react';
+import { Analytics } from '@vercel/analytics/react';
 import { Navbar } from './components/Navbar';
 import { DashboardView } from './components/DashboardView';
 import { VisualCalendarView } from './components/VisualCalendarView';
@@ -375,6 +376,7 @@ export default function App() {
           <p>Design aux couleurs INNID (#064E3B, #F59E0B) • Blida • Protection anti-chevauchement serveur</p>
         </div>
       </footer>
+      <Analytics />
     </div>
   );
 }
