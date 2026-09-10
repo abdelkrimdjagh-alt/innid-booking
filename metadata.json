@@ -1,0 +1,6 @@
+{
+  "name": "INNID Booking",
+  "description": "Plateforme de gestion et réservation de salles de réunion et coworking INNID avec calendrier visuel et protection anti-chevauchement.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
