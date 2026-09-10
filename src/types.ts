@@ -24,6 +24,7 @@ export interface Client {
 }
 
 export type StatutReservation = 'Confirmée' | 'En attente' | 'Annulée';
+export type CanalReservation = 'WhatsApp' | 'Instagram' | 'Email' | 'Téléphone' | 'Direct';
 export type TypeReservation =
   | 'Réunion'
   | 'Formation'
@@ -54,6 +55,7 @@ export interface Reservation {
   nombre_personnes: number;
   type: TypeReservation;
   statut: StatutReservation;
+  canal_reservation?: CanalReservation;
   chaises_reservees?: number[]; // Liste des numéros de chaises (1 à 45 pour Coworking)
   formule_tarifaire?: string; // ex: 'Pack Étudiant (5 850 DA)', 'Journée (6 000 DA)'
   montant_total?: number; // en Dinars Algériens (DA)

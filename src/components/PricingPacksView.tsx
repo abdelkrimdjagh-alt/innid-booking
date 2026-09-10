@@ -15,9 +15,18 @@ import {
   Calculator,
   FileText,
   BadgeCheck,
+  MessageCircle,
+  Instagram,
+  Mail,
+  ExternalLink,
 } from 'lucide-react';
 import { PACKS_COWORKING, OFFRES_PME, OFFRE_DOMICILIATION } from '../services/storage';
 import { Salle } from '../types';
+import {
+  INNID_CONTACTS,
+  getWhatsAppBookingUrl,
+  getEmailBookingUrl,
+} from '../utils/contactChannels';
 
 interface PricingPacksViewProps {
   salles: Salle[];
@@ -350,12 +359,53 @@ export const PricingPacksView: React.FC<PricingPacksViewProps> = ({
                   </span>
                 </div>
 
-                <button
-                  onClick={() => onSelectPackBooking(simPack as any, simPersonnes)}
-                  className="bg-[#F59E0B] hover:bg-[#d98206] text-white px-4 py-2.5 rounded-xl text-xs font-black shadow-md transition-transform active:scale-95"
-                >
-                  Réserver ce devis
-                </button>
+                <div className="flex items-center space-x-2">
+                  <button
+                    onClick={() => onSelectPackBooking(simPack as any, simPersonnes)}
+                    className="bg-[#F59E0B] hover:bg-[#d98206] text-white px-4 py-2.5 rounded-xl text-xs font-black shadow-md transition-transform active:scale-95"
+                  >
+                    Réserver ce devis
+                  </button>
+
+                  <a
+                    href={getWhatsAppBookingUrl({
+                      formuleOuType: `${simPack} (${simPersonnes} pers.)`,
+                      nombrePersonnes: simPersonnes,
+                      notes: `Demande de devis pack ${simPack} pour ${simPersonnes} personne(s). Montant estimé: ${simResult.total.toLocaleString()} DA.`,
+                    })}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="p-2.5 bg-emerald-600 hover:bg-emerald-500 text-white rounded-xl text-xs font-bold flex items-center space-x-1"
+                    title="Envoyer ce devis par WhatsApp (+213 550 12 34 56)"
+                  >
+                    <MessageCircle className="w-4 h-4" />
+                    <span className="hidden sm:inline">WhatsApp</span>
+                  </a>
+
+                  <a
+                    href={INNID_CONTACTS.instagramUrl}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="p-2.5 bg-pink-600 hover:bg-pink-500 text-white rounded-xl text-xs font-bold flex items-center space-x-1"
+                    title="Contacter sur Instagram (@innidworkspace)"
+                  >
+                    <Instagram className="w-4 h-4" />
+                    <span className="hidden sm:inline">Insta</span>
+                  </a>
+
+                  <a
+                    href={getEmailBookingUrl({
+                      formuleOuType: `${simPack} (${simPersonnes} pers.)`,
+                      nombrePersonnes: simPersonnes,
+                      notes: `Demande de devis pour ${simPersonnes} personne(s). Montant estimé: ${simResult.total.toLocaleString()} DA.`,
+                    })}
+                    className="p-2.5 bg-emerald-800 hover:bg-emerald-700 text-white rounded-xl text-xs font-bold flex items-center space-x-1"
+                    title="Envoyer un email à inndweb@gmail.com"
+                  >
+                    <Mail className="w-4 h-4 text-[#F59E0B]" />
+                    <span className="hidden sm:inline">inndweb@gmail.com</span>
+                  </a>
+                </div>
               </div>
             </div>
           </div>

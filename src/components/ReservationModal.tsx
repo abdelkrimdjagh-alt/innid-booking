@@ -14,12 +14,17 @@ import {
   ArrowRight,
   Calculator,
   Tag,
+  MessageCircle,
+  Instagram,
+  Mail,
+  ExternalLink,
 } from 'lucide-react';
 import {
   Salle,
   Reservation,
   TypeReservation,
   StatutReservation,
+  CanalReservation,
   ConflitVerificationResult,
 } from '../types';
 import {
@@ -28,6 +33,12 @@ import {
   calculerMontantEstime,
   getChaisesStatus,
 } from '../services/storage';
+import {
+  INNID_CONTACTS,
+  getWhatsAppBookingUrl,
+  getEmailBookingUrl,
+  BookingMessageParams,
+} from '../utils/contactChannels';
 
 interface ReservationModalProps {
   isOpen: boolean;
@@ -86,6 +97,7 @@ export const ReservationModal: React.FC<ReservationModalProps> = ({
   const [nombrePersonnes, setNombrePersonnes] = useState(6);
   const [type, setType] = useState<TypeReservation>('Réunion');
   const [statut, setStatut] = useState<StatutReservation>('Confirmée');
+  const [canalReservation, setCanalReservation] = useState<CanalReservation>('WhatsApp');
   const [notes, setNotes] = useState('');
   const [chaisesSelectionnees, setChaisesSelectionnees] = useState<number[]>([]);
 
@@ -105,6 +117,7 @@ export const ReservationModal: React.FC<ReservationModalProps> = ({
       setNombrePersonnes(initialReservation.nombre_personnes);
       setType(initialReservation.type);
       setStatut(initialReservation.statut);
+      setCanalReservation(initialReservation.canal_reservation || 'WhatsApp');
       setNotes(initialReservation.notes || '');
       setChaisesSelectionnees(initialReservation.chaises_reservees || []);
     } else {
@@ -123,6 +136,7 @@ export const ReservationModal: React.FC<ReservationModalProps> = ({
       setNombrePersonnes(prefillNbPersonnes || prefillChaises?.length || 1);
       setType(prefillType || 'Réunion');
       setStatut('Confirmée');
+      setCanalReservation('WhatsApp');
       setNotes('');
       setChaisesSelectionnees(prefillChaises || []);
     }
@@ -213,6 +227,7 @@ export const ReservationModal: React.FC<ReservationModalProps> = ({
       chaises_reservees: isCoworking ? chaisesSelectionnees : undefined,
       type,
       statut,
+      canal_reservation: canalReservation,
       formule_tarifaire: estimationPrix.formule,
       montant_total: estimationPrix.montant,
       notes: notes.trim(),
@@ -522,6 +537,98 @@ export const ReservationModal: React.FC<ReservationModalProps> = ({
                   </option>
                 ))}
               </select>
+            </div>
+
+            <div>
+              <label className="block font-bold text-gray-700 mb-1">
+                CANAL DE RÉSERVATION
+              </label>
+              <select
+                id="select-res-canal"
+                value={canalReservation}
+                onChange={(e) => setCanalReservation(e.target.value as CanalReservation)}
+                className="w-full px-3 py-2 bg-white border border-gray-300 rounded-xl text-xs font-bold text-gray-900 focus:ring-2 focus:ring-[#064E3B] focus:outline-hidden"
+              >
+                <option value="WhatsApp">🟢 WhatsApp (+213 550 12 34 56)</option>
+                <option value="Instagram">📸 Instagram (@innidworkspace)</option>
+                <option value="Email">✉️ Email (inndweb@gmail.com)</option>
+                <option value="Téléphone">📞 Appel Téléphonique</option>
+                <option value="Direct">🏢 Sur place / Accueil physique</option>
+              </select>
+            </div>
+          </div>
+
+          {/* Direct Communication / Quick Transmission Channels */}
+          <div className="bg-gray-50 border border-gray-200 rounded-2xl p-3.5 space-y-2">
+            <div className="flex items-center justify-between">
+              <span className="text-[11px] font-black uppercase text-gray-700 tracking-wider flex items-center space-x-1.5">
+                <Tag className="w-3.5 h-3.5 text-[#F59E0B]" />
+                <span>Transmission directe au client ou à l'équipe</span>
+              </span>
+              <span className="text-[10px] text-gray-500 font-mono">inndweb@gmail.com</span>
+            </div>
+
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-2">
+              <button
+                type="button"
+                onClick={() => {
+                  const url = getWhatsAppBookingUrl({
+                    clientNom: clientNom || 'Client INNID',
+                    clientTelephone: clientTelephone || undefined,
+                    salleNom: currentSalle?.nom,
+                    date,
+                    heureDebut,
+                    heureFin,
+                    nombrePersonnes,
+                    formuleOuType: type,
+                    notes: notes || undefined,
+                  });
+                  window.open(url, '_blank', 'noopener,noreferrer');
+                }}
+                className="px-3 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs flex items-center justify-center space-x-1.5 shadow-2xs transition-colors"
+                title="Préparer le message WhatsApp"
+              >
+                <MessageCircle className="w-3.5 h-3.5" />
+                <span>Ouvrir WhatsApp</span>
+                <ExternalLink className="w-3 h-3 opacity-70" />
+              </button>
+
+              <button
+                type="button"
+                onClick={() => {
+                  window.open(INNID_CONTACTS.instagramUrl, '_blank', 'noopener,noreferrer');
+                }}
+                className="px-3 py-2 rounded-xl bg-gradient-to-r from-pink-600 via-rose-600 to-amber-600 hover:opacity-95 text-white font-bold text-xs flex items-center justify-center space-x-1.5 shadow-2xs transition-colors"
+                title="Ouvrir Instagram INNID"
+              >
+                <Instagram className="w-3.5 h-3.5" />
+                <span>Instagram</span>
+                <ExternalLink className="w-3 h-3 opacity-70" />
+              </button>
+
+              <button
+                type="button"
+                onClick={() => {
+                  const url = getEmailBookingUrl({
+                    clientNom: clientNom || 'Client INNID',
+                    clientTelephone: clientTelephone || undefined,
+                    salleNom: currentSalle?.nom,
+                    date,
+                    heureDebut,
+                    heureFin,
+                    nombrePersonnes,
+                    formuleOuType: type,
+                    notes: notes || undefined,
+                  });
+                  window.location.href = url;
+                }}
+                className="px-3 py-2 rounded-xl bg-[#064E3B] hover:bg-[#043d2e] text-white font-bold text-xs flex items-center justify-center space-x-1.5 shadow-2xs transition-colors"
+                title="Envoyer un email à inndweb@gmail.com"
+              >
+                <Mail className="w-3.5 h-3.5 text-[#F59E0B]" />
+                <span>inndweb@gmail.com</span>
+                <ExternalLink className="w-3 h-3 opacity-70" />
+              </button>
             </div>
           </div>
 

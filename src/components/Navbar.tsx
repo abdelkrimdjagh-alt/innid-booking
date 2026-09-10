@@ -13,6 +13,9 @@ import {
   Sliders,
   Sparkles,
   TrendingUp,
+  MessageCircle,
+  Instagram,
+  Mail,
 } from 'lucide-react';
 import { UserSession } from '../types';
 
@@ -22,6 +25,7 @@ interface NavbarProps {
   selectedDate: string;
   setSelectedDate: (date: string) => void;
   onOpenNewReservation: () => void;
+  onOpenDirectBookingModal?: () => void;
   userSession: UserSession;
   setUserSession: React.Dispatch<React.SetStateAction<UserSession>>;
 }
@@ -32,6 +36,7 @@ export const Navbar: React.FC<NavbarProps> = ({
   selectedDate,
   setSelectedDate,
   onOpenNewReservation,
+  onOpenDirectBookingModal,
   userSession,
   setUserSession,
 }) => {
@@ -135,6 +140,22 @@ export const Navbar: React.FC<NavbarProps> = ({
 
           {/* Action Button & User profile */}
           <div className="flex items-center space-x-2 sm:space-x-3">
+            {onOpenDirectBookingModal && (
+              <button
+                id="btn-nav-direct-channels"
+                onClick={onOpenDirectBookingModal}
+                className="hidden lg:flex items-center space-x-2 bg-emerald-50 hover:bg-emerald-100 text-[#064E3B] px-3.5 py-2.5 rounded-xl font-extrabold shadow-2xs hover:shadow-xs transition-all text-xs border border-emerald-300"
+                title="Réserver via WhatsApp, Instagram ou Email (inndweb@gmail.com)"
+              >
+                <div className="flex items-center -space-x-1">
+                  <span className="w-4 h-4 rounded-full bg-emerald-600 text-white flex items-center justify-center text-[9px] shadow-2xs font-bold">W</span>
+                  <span className="w-4 h-4 rounded-full bg-gradient-to-tr from-amber-500 to-pink-600 text-white flex items-center justify-center text-[9px] shadow-2xs font-bold">I</span>
+                  <span className="w-4 h-4 rounded-full bg-[#064E3B] text-white flex items-center justify-center text-[9px] shadow-2xs font-bold">@</span>
+                </div>
+                <span>WhatsApp • Insta • inndweb</span>
+              </button>
+            )}
+
             <button
               id="btn-nav-new-reservation"
               onClick={onOpenNewReservation}

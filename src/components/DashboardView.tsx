@@ -24,9 +24,18 @@ import {
   SlidersHorizontal,
   Flame,
   ExternalLink,
+  MessageCircle,
+  Instagram,
+  Mail,
+  Send,
 } from 'lucide-react';
 import { Salle, Reservation } from '../types';
 import { StatsDashboardView } from './StatsDashboardView';
+import {
+  INNID_CONTACTS,
+  getWhatsAppBookingUrl,
+  getEmailBookingUrl,
+} from '../utils/contactChannels';
 
 interface DashboardViewProps {
   salles: Salle[];
@@ -36,6 +45,7 @@ interface DashboardViewProps {
   onGoToPlanning: () => void;
   onGoToToday: () => void;
   onSelectReservation?: (res: Reservation) => void;
+  onOpenDirectBookingModal?: () => void;
   initialSubTab?: 'overview' | 'statistiques';
 }
 
@@ -47,6 +57,7 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
   onGoToPlanning,
   onGoToToday,
   onSelectReservation,
+  onOpenDirectBookingModal,
   initialSubTab = 'overview',
 }) => {
   const [activeSubTab, setActiveSubTab] = useState<'overview' | 'statistiques'>(initialSubTab);
@@ -249,6 +260,100 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
           <span className="hidden sm:inline bg-emerald-800/60 px-2.5 py-1 rounded-md text-[11px] font-mono border border-emerald-700">
             SQL Query Check: PASS
           </span>
+        </div>
+      </div>
+
+      {/* Direct Booking Channels Banner : WhatsApp, Instagram, Email inndweb@gmail.com */}
+      <div className="bg-gradient-to-r from-emerald-900 via-[#064E3B] to-teal-900 rounded-3xl p-5 sm:p-6 text-white shadow-sm border border-emerald-700/50 flex flex-col lg:flex-row lg:items-center lg:justify-between gap-5">
+        <div className="space-y-1.5 max-w-xl">
+          <div className="inline-flex items-center space-x-2 bg-[#F59E0B]/20 text-[#F59E0B] text-[11px] font-extrabold uppercase px-2.5 py-0.5 rounded-full border border-[#F59E0B]/30">
+            <Sparkles className="w-3.5 h-3.5" />
+            <span>Canaux Directs de Réservation</span>
+          </div>
+          <h3 className="text-lg sm:text-xl font-black tracking-tight flex items-center space-x-2">
+            <span>Réservation via WhatsApp, Insta ou Email</span>
+          </h3>
+          <p className="text-xs text-emerald-200 leading-relaxed">
+            Bloquez votre salle en quelques secondes en écrivant directement sur nos réseaux officiels ou à{' '}
+            <strong className="text-white font-mono bg-emerald-800/80 px-1.5 py-0.5 rounded border border-emerald-700">
+              inndweb@gmail.com
+            </strong>
+          </p>
+        </div>
+
+        {/* 3 Quick Action Buttons */}
+        <div className="flex flex-wrap items-center gap-2 sm:gap-3">
+          {/* WhatsApp Button */}
+          <a
+            href={getWhatsAppBookingUrl({
+              date: selectedDate,
+              salleNom: 'Espace INNID',
+              notes: 'Demande effectuée depuis le Dashboard INNID',
+            })}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="px-3.5 py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs flex items-center space-x-2 shadow-sm transition-all hover:scale-105 active:scale-95"
+            title="Démarrer un chat WhatsApp (+213 550 12 34 56)"
+          >
+            <MessageCircle className="w-4 h-4 text-white" />
+            <div className="text-left">
+              <span className="block leading-none">WhatsApp</span>
+              <span className="text-[10px] text-emerald-200 font-mono font-normal">
+                {INNID_CONTACTS.whatsappDisplay}
+              </span>
+            </div>
+            <ExternalLink className="w-3 h-3 opacity-70" />
+          </a>
+
+          {/* Instagram Button */}
+          <a
+            href={INNID_CONTACTS.instagramUrl}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="px-3.5 py-2.5 rounded-xl bg-gradient-to-r from-pink-600 via-rose-600 to-amber-600 hover:opacity-95 text-white font-bold text-xs flex items-center space-x-2 shadow-sm transition-all hover:scale-105 active:scale-95"
+            title="Ouvrir le profil et DM Instagram (@innidworkspace)"
+          >
+            <Instagram className="w-4 h-4 text-white" />
+            <div className="text-left">
+              <span className="block leading-none">Instagram</span>
+              <span className="text-[10px] text-pink-200 font-mono font-normal">
+                {INNID_CONTACTS.instagramHandle}
+              </span>
+            </div>
+            <ExternalLink className="w-3 h-3 opacity-70" />
+          </a>
+
+          {/* Email Button */}
+          <a
+            href={getEmailBookingUrl({
+              date: selectedDate,
+              salleNom: 'Espace INNID',
+              notes: 'Demande effectuée depuis le Dashboard INNID',
+            })}
+            className="px-3.5 py-2.5 rounded-xl bg-[#064E3B] hover:bg-[#043d2e] border border-emerald-600 text-white font-bold text-xs flex items-center space-x-2 shadow-sm transition-all hover:scale-105 active:scale-95"
+            title="Envoyer un email à inndweb@gmail.com"
+          >
+            <Mail className="w-4 h-4 text-[#F59E0B]" />
+            <div className="text-left">
+              <span className="block leading-none">Email Officiel</span>
+              <span className="text-[10px] text-emerald-200 font-mono font-normal">
+                {INNID_CONTACTS.email}
+              </span>
+            </div>
+            <ExternalLink className="w-3 h-3 opacity-70" />
+          </a>
+
+          {/* Assistant Modal trigger */}
+          {onOpenDirectBookingModal && (
+            <button
+              onClick={onOpenDirectBookingModal}
+              className="px-3 py-2.5 rounded-xl bg-white/10 hover:bg-white/20 text-white font-bold text-xs border border-white/20 flex items-center space-x-1.5 transition-colors"
+              title="Configurer une demande personnalisée multicanal"
+            >
+              <Send className="w-3.5 h-3.5 text-[#F59E0B]" />
+              <span className="hidden sm:inline">Formulaire Rapide</span>
+            </button>
+          )}
         </div>
       </div>
 

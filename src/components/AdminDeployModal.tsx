@@ -71,7 +71,7 @@ export const AdminDeployModal: React.FC<AdminDeployModalProps> = ({
 }) => {
   const [copiedSql, setCopiedSql] = useState(false);
   const [copiedBash, setCopiedBash] = useState(false);
-  const [activeTab, setActiveTab] = useState<'vps' | 'local' | 'sql'>('vps');
+  const [activeTab, setActiveTab] = useState<'vercel' | 'vps' | 'local' | 'sql'>('vercel');
 
   const handleCopySql = () => {
     navigator.clipboard.writeText(SQL_SCHEMA);
@@ -139,7 +139,19 @@ npx tsx backend/server.ts`;
 
       {/* Deployment Options Tabs */}
       <div className="bg-white rounded-3xl p-6 sm:p-8 border border-gray-200 shadow-sm space-y-6">
-        <div className="flex border-b border-gray-200 space-x-3">
+        <div className="flex flex-wrap border-b border-gray-200 gap-2 sm:gap-3">
+          <button
+            onClick={() => setActiveTab('vercel')}
+            className={`pb-3 px-3 text-sm font-bold flex items-center space-x-2 border-b-2 transition-all ${
+              activeTab === 'vercel'
+                ? 'border-[#064E3B] text-[#064E3B]'
+                : 'border-transparent text-gray-500 hover:text-gray-800'
+            }`}
+          >
+            <Globe className="w-4 h-4 text-[#F59E0B]" />
+            <span>Option 1 : Vercel (Cloud Gratuit)</span>
+          </button>
+
           <button
             onClick={() => setActiveTab('vps')}
             className={`pb-3 px-3 text-sm font-bold flex items-center space-x-2 border-b-2 transition-all ${
@@ -148,8 +160,8 @@ npx tsx backend/server.ts`;
                 : 'border-transparent text-gray-500 hover:text-gray-800'
             }`}
           >
-            <Globe className="w-4 h-4 text-[#F59E0B]" />
-            <span>Option 1 : Serveur VPS (Professionnelle)</span>
+            <Server className="w-4 h-4 text-[#064E3B]" />
+            <span>Option 2 : Serveur VPS (Ubuntu/Debian)</span>
           </button>
 
           <button
@@ -161,7 +173,7 @@ npx tsx backend/server.ts`;
             }`}
           >
             <HardDrive className="w-4 h-4 text-[#064E3B]" />
-            <span>Option 2 : Serveur Local Réception INNID</span>
+            <span>Option 3 : Réception Locale (PC INNID)</span>
           </button>
 
           <button
@@ -176,6 +188,73 @@ npx tsx backend/server.ts`;
             <span>Schéma PostgreSQL & Requêtes</span>
           </button>
         </div>
+
+        {/* Option Vercel Guide & Error Resolution */}
+        {activeTab === 'vercel' && (
+          <div className="space-y-6 text-xs text-gray-700">
+            <div className="bg-emerald-50/70 p-5 rounded-2xl border border-emerald-200">
+              <h3 className="text-sm font-bold text-[#064E3B] flex items-center space-x-2 mb-2">
+                <Globe className="w-4 h-4 text-[#F59E0B]" />
+                <span>Déploiement sur Vercel (Explication de l'erreur et résolution) :</span>
+              </h3>
+              <p className="text-emerald-950 font-medium leading-relaxed">
+                Si votre lien Vercel (ex: <code className="bg-white/80 px-2 py-0.5 rounded font-mono font-bold text-gray-800">innid-booking-fm5rtuq0g-innid.vercel.app</code>) affiche une erreur 404, 500 ou de déploiement, voici les 3 causes fréquentes et comment les corriger en 1 minute :
+              </p>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+              <div className="p-4 rounded-2xl bg-amber-50/50 border border-amber-200 space-y-2">
+                <div className="flex items-center space-x-2">
+                  <span className="w-6 h-6 rounded-full bg-[#F59E0B] text-white flex items-center justify-center font-bold text-xs">
+                    1
+                  </span>
+                  <h4 className="font-bold text-gray-900 text-sm">Output Directory</h4>
+                </div>
+                <p className="text-gray-600 leading-relaxed">
+                  Sur Vercel, dans <strong>Settings ➔ Build & Development</strong>, assurez-vous que <strong>Output Directory</strong> est bien configuré sur <code className="bg-white px-1.5 py-0.5 rounded border border-amber-200 font-mono font-black text-emerald-800">dist</code> (et non vide ou public).
+                </p>
+              </div>
+
+              <div className="p-4 rounded-2xl bg-amber-50/50 border border-amber-200 space-y-2">
+                <div className="flex items-center space-x-2">
+                  <span className="w-6 h-6 rounded-full bg-[#F59E0B] text-white flex items-center justify-center font-bold text-xs">
+                    2
+                  </span>
+                  <h4 className="font-bold text-gray-900 text-sm">Framework Preset</h4>
+                </div>
+                <p className="text-gray-600 leading-relaxed">
+                  Vérifiez que le preset est sélectionné sur <strong>Vite</strong>. La commande de build doit être <code className="bg-white px-1.5 py-0.5 rounded border border-amber-200 font-mono font-bold text-gray-800">npm run build</code>.
+                </p>
+              </div>
+
+              <div className="p-4 rounded-2xl bg-amber-50/50 border border-amber-200 space-y-2">
+                <div className="flex items-center space-x-2">
+                  <span className="w-6 h-6 rounded-full bg-[#F59E0B] text-white flex items-center justify-center font-bold text-xs">
+                    3
+                  </span>
+                  <h4 className="font-bold text-gray-900 text-sm">Protection Vercel</h4>
+                </div>
+                <p className="text-gray-600 leading-relaxed">
+                  Les liens temporaires avec un hash (<code className="font-mono text-[11px]">-fm5rtuq0g-</code>) sont protégés par <em>Vercel Authentication</em>. Utilisez le lien de production principal : <code className="bg-white px-1.5 py-0.5 rounded border border-amber-200 font-mono font-bold text-[#064E3B]">innid-booking.vercel.app</code>.
+                </p>
+              </div>
+            </div>
+
+            <div className="bg-gray-900 text-gray-100 p-4 rounded-2xl border border-gray-800 space-y-2 font-mono text-[11px]">
+              <div className="flex items-center justify-between text-gray-400 border-b border-gray-800 pb-2">
+                <span>Fichier racine vercel.json (déjà généré dans votre projet) :</span>
+                <span className="text-emerald-400 font-bold">✓ Actif</span>
+              </div>
+              <pre className="text-emerald-300">
+{`{
+  "rewrites": [
+    { "source": "/(.*)", "destination": "/index.html" }
+  ]
+}`}
+              </pre>
+            </div>
+          </div>
+        )}
 
         {/* Option 1: VPS Guide */}
         {activeTab === 'vps' && (

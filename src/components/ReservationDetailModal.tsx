@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import {
   X,
   Clock,
@@ -13,8 +13,20 @@ import {
   Ban,
   CheckCircle,
   Share2,
+  MessageCircle,
+  Instagram,
+  Mail,
+  Copy,
+  Check,
+  ExternalLink,
 } from 'lucide-react';
 import { Reservation, Salle } from '../types';
+import {
+  INNID_CONTACTS,
+  getWhatsAppRecapUrl,
+  getEmailRecapUrl,
+  generateReservationRecapText,
+} from '../utils/contactChannels';
 
 interface ReservationDetailModalProps {
   reservation: Reservation | null;
@@ -35,6 +47,7 @@ export const ReservationDetailModal: React.FC<ReservationDetailModalProps> = ({
 }) => {
   if (!reservation) return null;
 
+  const [copied, setCopied] = useState(false);
   const salle = salles.find((s) => s.id === reservation.salle_id);
 
   const formatDateLong = (dateStr: string) => {
@@ -50,6 +63,30 @@ export const ReservationDetailModal: React.FC<ReservationDetailModalProps> = ({
     } catch {
       return dateStr;
     }
+  };
+
+  const handleCopyRecap = () => {
+    const text = generateReservationRecapText(reservation, salle?.nom);
+    navigator.clipboard.writeText(text);
+    setCopied(true);
+    setTimeout(() => setCopied(false), 2500);
+  };
+
+  const handleOpenWhatsApp = () => {
+    const url = getWhatsAppRecapUrl(reservation, salle?.nom);
+    window.open(url, '_blank', 'noopener,noreferrer');
+  };
+
+  const handleOpenInstagram = () => {
+    const text = generateReservationRecapText(reservation, salle?.nom);
+    navigator.clipboard.writeText(text);
+    setCopied(true);
+    window.open(INNID_CONTACTS.instagramUrl, '_blank', 'noopener,noreferrer');
+  };
+
+  const handleOpenEmail = () => {
+    const url = getEmailRecapUrl(reservation, salle?.nom);
+    window.location.href = url;
   };
 
   return (
@@ -171,6 +208,67 @@ export const ReservationDetailModal: React.FC<ReservationDetailModalProps> = ({
               <p className="text-amber-950 italic">{reservation.notes}</p>
             </div>
           )}
+
+          {/* Canal de réservation & Partage direct WhatsApp / Insta / inndweb@gmail.com */}
+          <div className="bg-emerald-50/50 rounded-2xl p-4 border border-emerald-200 space-y-3">
+            <div className="flex items-center justify-between">
+              <span className="text-xs font-black uppercase text-[#064E3B] tracking-wider flex items-center space-x-1.5">
+                <Share2 className="w-3.5 h-3.5 text-[#F59E0B]" />
+                <span>Partager & Confirmer la réservation</span>
+              </span>
+              {reservation.canal_reservation && (
+                <span className="bg-emerald-200/70 text-[#064E3B] text-[10px] font-bold px-2 py-0.5 rounded-full font-mono">
+                  Canal : {reservation.canal_reservation}
+                </span>
+              )}
+            </div>
+
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-2">
+              {/* WhatsApp */}
+              <button
+                onClick={handleOpenWhatsApp}
+                className="px-3 py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs flex items-center justify-center space-x-1.5 shadow-2xs transition-all"
+                title="Envoyer le récapitulatif par WhatsApp"
+              >
+                <MessageCircle className="w-3.5 h-3.5" />
+                <span>WhatsApp</span>
+                <ExternalLink className="w-3 h-3 opacity-75" />
+              </button>
+
+              {/* Instagram */}
+              <button
+                onClick={handleOpenInstagram}
+                className="px-3 py-2.5 rounded-xl bg-gradient-to-r from-pink-600 via-rose-600 to-amber-600 hover:opacity-95 text-white font-bold text-xs flex items-center justify-center space-x-1.5 shadow-2xs transition-all"
+                title="Copier et ouvrir Instagram (@innidworkspace)"
+              >
+                <Instagram className="w-3.5 h-3.5" />
+                <span>Instagram</span>
+                <ExternalLink className="w-3 h-3 opacity-75" />
+              </button>
+
+              {/* Email inndweb@gmail.com */}
+              <button
+                onClick={handleOpenEmail}
+                className="px-3 py-2.5 rounded-xl bg-[#064E3B] hover:bg-[#043d2e] text-white font-bold text-xs flex items-center justify-center space-x-1.5 shadow-2xs transition-all"
+                title="Envoyer un email à inndweb@gmail.com"
+              >
+                <Mail className="w-3.5 h-3.5 text-[#F59E0B]" />
+                <span>Email (inndweb)</span>
+                <ExternalLink className="w-3 h-3 opacity-75" />
+              </button>
+            </div>
+
+            <div className="flex items-center justify-between pt-1 text-[11px] text-gray-600">
+              <span>Contact INNID : <strong className="font-mono text-[#064E3B]">inndweb@gmail.com</strong></span>
+              <button
+                onClick={handleCopyRecap}
+                className="font-bold text-[#064E3B] hover:underline flex items-center space-x-1"
+              >
+                {copied ? <Check className="w-3 h-3 text-emerald-600" /> : <Copy className="w-3 h-3" />}
+                <span>{copied ? 'Copié !' : 'Copier texte'}</span>
+              </button>
+            </div>
+          </div>
 
           {/* Actions */}
           <div className="pt-4 border-t border-gray-100 flex flex-wrap items-center justify-between gap-2">
